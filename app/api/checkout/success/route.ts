@@ -10,13 +10,24 @@ export async function POST(request: Request, response: Response) {
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    const purchase = await prisma.purchase.create({
-      data: {
+    const exidtingPurchase = await prisma.purchase.findFirst({
+      where: {
         userId: session.client_reference_id!,
         bookId: session.metadata?.bookId!,
       },
     });
-    return NextResponse.json(purchase);
+
+    if (!exidtingPurchase) {
+      const purchase = await prisma.purchase.create({
+        data: {
+          userId: session.client_reference_id!,
+          bookId: session.metadata?.bookId!,
+        },
+      });
+      return NextResponse.json(purchase);
+    } else {
+      return NextResponse.json({ message: "すでに購入済みです。" });
+    }
   } catch (err: any) {
     return NextResponse.json(err.massage);
   }
