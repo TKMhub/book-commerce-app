@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const PurchaseSuccess = () => {
+  const [bookUrl, setBookUrl] = useState(null);
   const serchParams = useSearchParams();
   const sessionId = serchParams.get("session_id");
 
@@ -13,6 +14,7 @@ const PurchaseSuccess = () => {
     const fetchData = async () => {
       if (sessionId) {
         try {
+          console.log(sessionId);
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/checkout/success`,
             {
@@ -21,10 +23,9 @@ const PurchaseSuccess = () => {
               body: JSON.stringify({ sessionId }),
             }
           );
-          fetchData();
-        } catch (err) {
-          console.log(err);
-        }
+          const data = await res.json();
+          setBookUrl(data.purchase.bookId);
+        } catch (err) {}
       }
     };
   }, []);
@@ -40,7 +41,7 @@ const PurchaseSuccess = () => {
         </p>
         <div className="mt-6 text-center">
           <Link
-            href={`/`}
+            href={`/book/${bookUrl}`}
             className="text-indigo-600 hover:text-indigo-800 transition duration-300"
           >
             購入した記事を読む
