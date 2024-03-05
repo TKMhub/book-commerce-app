@@ -1,7 +1,9 @@
+import { getDetailBook } from "@/app/lib/next-auth/microCMS/client";
 import Image from "next/image";
 import React from "react";
 
-const DetailBook = async () => {
+const DetailBook = async ({ params }: { params: { id: string } }) => {
+  const book = await getDetailBook(params.id); //SSR
   return (
     <div className="container mx-auto p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
